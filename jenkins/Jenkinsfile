@@ -1,0 +1,61 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "yourdockerhubusername/insurance:latest"
+        KUBE_CONFIG = "$HOME/.kube/config"
+    }
+
+    stages {
+
+        stage('Git Checkout') {
+            steps {
+                echo 'Cloning Insurance GitHub repository'
+                git branch: 'main',
+                    url: 'https://github.com/yourusername/insurance-devops-project.git'
+            }
+        }
+
+        stage('Build Application') {
+            steps {
+                echo 'Building Insurance application using Maven'
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image'
+                sh 'docker build -t $DOCKER_IMAGE .'
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                echo 'Pushing Docker image to DockerHub'
+                withCredentials([string(credentialsId: 'dockerhub-password', variable: 'DOCKER_PASSWORD')]) {
+                    sh '''
+                        echo $DOCKER_PASSWORD | docker login -u yourdockerhubusername --password-stdin
+                        docker push $DOCKER_IMAGE
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                echo 'Deploying Insurance application to Kubernetes'
+                sh 'kubectl apply -f kubernetes/insurance-deployment.yml'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Insurance application deployed successfully 🚀'
+        }
+        failure {
+            echo 'Pipeline failed ❌ Check Jenkins logs'
+        }
+    }
+}
