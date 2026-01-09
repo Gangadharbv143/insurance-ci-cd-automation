@@ -1,0 +1,23 @@
+financeme-devops-project/
+│
+├── README.md
+│
+├── ansible/
+│   └── install_tools.yml
+│
+├── jenkins/
+│   └── Jenkinsfile
+│
+├── kubernetes/
+│   └── financeme-deployment.yml
+│
+├── docker/
+│   └── Dockerfile
+│
+├── screenshots/
+│   ├── jenkins-pipeline-success.png
+│   ├── kubectl-get-nodes.png
+│   ├── kubectl-get-all.png
+│   └── financeme-app-output.png
+│
+└── .gitignore
